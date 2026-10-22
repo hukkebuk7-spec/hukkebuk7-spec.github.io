@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tempo-field-guide.pages.dev/sitemap.xml

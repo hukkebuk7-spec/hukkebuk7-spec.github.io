@@ -1,0 +1,63 @@
+:root {
+  /* Colour — archival paper, ink, signal, and two working accents */
+  --paper: #f2efe6;
+  --paper-raised: #f8f5ec;
+  --paper-sunk: #e7e2d4;
+  --ink: #16150f;
+  --ink-soft: #555145;
+  --ink-faint: #675f4e;
+  --line: #c9c3b1;
+  --line-strong: #96907e;
+  --signal: #e5441c;
+  --signal-deep: #b82f0d;
+  --on-signal: #0b0a07;
+  --signal-wash: #f7d9ce;
+  --blue: #2136c9;
+  --acid: #ddf04a;
+  --acid-deep: #b5c92c;
+  --white: #fffdf8;
+
+  /* Type */
+  --font-sans: 'Bricolage Grotesque Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'DM Mono', 'SFMono-Regular', Consolas, monospace;
+
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 1rem;
+  --text-md: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --text-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  --text-xl: clamp(1.65rem, 1.35rem + 1.4vw, 2.5rem);
+  --text-2xl: clamp(2.2rem, 1.6rem + 2.9vw, 4.25rem);
+  --text-3xl: clamp(2.9rem, 1.9rem + 4.8vw, 6.5rem);
+  --text-hero: clamp(3.3rem, 1.65rem + 7.6vw, 9.25rem);
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --gutter: clamp(1.125rem, 1.4rem + 2.2vw, 4rem);
+  --section: clamp(4.5rem, 3rem + 6vw, 8.5rem);
+  --max: 90rem;
+  --measure: 62ch;
+  --header-h: 4.25rem;
+
+  /* Borders and motion */
+  --rule: 1px solid var(--line);
+  --rule-strong: 1px solid var(--ink);
+  --shadow-hard: 6px 6px 0 var(--ink);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 160ms;
+  --dur-base: 280ms;
+  --dur-slow: 560ms;
+  --dur-reveal: 780ms;
+}

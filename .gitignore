@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.local
+.env.*.local
+playwright-report
+test-results
+.DS_Store
+*.local
+
+# Unrelated assets from a separate local project. Preserved on disk, not part of this repository.
+/test_image.png
+/comfy_run.py
+/workflow_api.json
+/wan_5b_ti2v_template.json
+/prompts.txt
