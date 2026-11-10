@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCopy } from '../lib/useCopy'
 import { useMotion } from '../lib/motion-context'
 import { Icon } from '../components/Icons'
@@ -125,7 +125,8 @@ function CurveEditor({
 }
 
 export function EasingLab() {
-  const [params, setParams] = useSearchParams()
+  const [params] = useSearchParams()
+  const navigate = useNavigate()
   const [curve, setCurve] = useState<Curve>(() => parseCurve(params.get('ease')))
   const [duration, setDuration] = useState(() => parseDuration(params.get('d')))
   const [runId, setRunId] = useState(0)
@@ -142,10 +143,13 @@ export function EasingLab() {
       const next = new URLSearchParams(window.location.search)
       next.set('ease', curve.join(','))
       next.set('d', String(duration))
-      setParams(next, { replace: true })
+      navigate(
+        { search: next.toString(), hash: window.location.hash },
+        { replace: true, preventScrollReset: true },
+      )
     }, 250)
     return () => window.clearTimeout(timeout)
-  }, [curve, duration, setParams])
+  }, [curve, duration, navigate])
 
   useEffect(() => {
     const track = trackRef.current

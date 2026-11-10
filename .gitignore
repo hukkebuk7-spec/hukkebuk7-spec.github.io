@@ -6,6 +6,7 @@ dist-ssr
 .env.*.local
 playwright-report
 test-results
+/output/
 .DS_Store
 *.local
 
@@ -15,3 +16,4 @@ test-results
 /workflow_api.json
 /wan_5b_ti2v_template.json
 /prompts.txt
+/carousel/

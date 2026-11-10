@@ -1,5 +1,6 @@
 import { PageMeta } from '../components/PageMeta'
 import { Reveal } from '../components/Reveal'
+import { SplitHeading } from '../components/SplitHeading'
 import { EasingLab } from '../features/EasingLab'
 import { SpringLab } from '../features/SpringLab'
 import { StaggerLab } from '../features/StaggerLab'
@@ -25,9 +26,10 @@ export function Lab() {
         <div className="wrap page-intro__grid">
           <p className="page-intro__label mono">02 / The lab</p>
           <div className="page-intro__body">
-            <h1>
-              Tune motion <em>by feel.</em>
-            </h1>
+            <SplitHeading
+              as="h1"
+              segments={[{ text: 'Tune motion' }, { text: 'by feel.', accent: true }]}
+            />
             <div className="page-intro__lead">
               <p>
                 Three tools for the part of motion that is hard to reason about: timing. Drag a
@@ -62,7 +64,7 @@ export function Lab() {
       <div className="lab-body">
         <section className="lab-section" id="easing" aria-labelledby="easing-title">
           <div className="wrap">
-            <Reveal className="lab-section__head">
+            <Reveal className="lab-section__head" variant="mask">
               <span className="mono lab-section__index">01 / Easing</span>
               <div>
                 <h2 id="easing-title">Curves, not <em className="serif">guesswork.</em></h2>
@@ -80,7 +82,7 @@ export function Lab() {
 
         <section className="lab-section lab-section--sunk" id="spring" aria-labelledby="spring-title">
           <div className="wrap">
-            <Reveal className="lab-section__head">
+            <Reveal className="lab-section__head" variant="mask">
               <span className="mono lab-section__index">02 / Spring</span>
               <div>
                 <h2 id="spring-title">Weight is a <em className="serif">physical</em> argument.</h2>
@@ -98,7 +100,7 @@ export function Lab() {
 
         <section className="lab-section" id="stagger" aria-labelledby="stagger-title">
           <div className="wrap">
-            <Reveal className="lab-section__head">
+            <Reveal className="lab-section__head" variant="mask">
               <span className="mono lab-section__index">03 / Stagger</span>
               <div>
                 <h2 id="stagger-title">Choreography is <em className="serif">rhythm.</em></h2>
@@ -116,7 +118,7 @@ export function Lab() {
 
         <section className="lab-section lab-section--sunk" id="defaults" aria-labelledby="defaults-title">
           <div className="wrap">
-            <Reveal className="lab-section__head">
+            <Reveal className="lab-section__head" variant="mask">
               <span className="mono lab-section__index">04 / House defaults</span>
               <div>
                 <h2 id="defaults-title">A defensible <em className="serif">starting point.</em></h2>

@@ -13,6 +13,7 @@ import './styles/base.css'
 import './styles/ui.css'
 import './styles/home.css'
 import './styles/pages.css'
+import './styles/jarvis.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

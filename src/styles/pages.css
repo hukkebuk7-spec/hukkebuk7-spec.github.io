@@ -1976,3 +1976,94 @@
     flex-direction: column;
   }
 }
+
+/* ——— Duration ruler ——— */
+.motion-ruler {
+  margin-top: clamp(2rem, 4vw, 3.25rem);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: var(--rule);
+  background: var(--paper-raised);
+}
+
+.motion-ruler__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: var(--rule);
+  color: var(--ink-soft);
+}
+
+.motion-ruler__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.75rem;
+  overflow: visible;
+}
+
+.motion-ruler__baseline {
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+
+.motion-ruler__zone {
+  fill: var(--acid);
+  opacity: 0.5;
+}
+
+.motion-ruler__mark line {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.motion-ruler__mark text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--ink-soft);
+}
+
+.motion-ruler__mark.is-key line {
+  stroke: var(--ink);
+}
+
+.motion-ruler__mark.is-key text {
+  fill: var(--ink);
+}
+
+.motion-ruler__note {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: var(--ink-faint);
+}
+
+.motion-ruler__runner line {
+  stroke: var(--signal);
+  stroke-width: 1.5;
+}
+
+.motion-ruler__runner circle {
+  fill: var(--signal);
+}
+
+.motion-ruler__runner text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--ink);
+}
+
+.motion-ruler__caption {
+  max-width: 62ch;
+  margin-top: 0.85rem;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .motion-ruler__note {
+    display: none;
+  }
+}

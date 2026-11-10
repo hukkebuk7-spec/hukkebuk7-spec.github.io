@@ -1,6 +1,8 @@
 import { PageMeta } from '../components/PageMeta'
 import { Icon } from '../components/Icons'
 import { Reveal } from '../components/Reveal'
+import { SplitHeading } from '../components/SplitHeading'
+import { MotionRuler } from '../features/MotionRuler'
 
 const references = [
   {
@@ -39,9 +41,13 @@ export function About() {
         <div className="wrap page-intro__grid">
           <p className="page-intro__label mono">04 / About</p>
           <div className="page-intro__body">
-            <h1>
-              A field guide, <em>not a rulebook.</em>
-            </h1>
+            <SplitHeading
+              as="h1"
+              segments={[
+                { text: 'A field guide,' },
+                { text: 'not a rulebook.', accent: true },
+              ]}
+            />
             <div className="page-intro__lead">
               <p>
                 TEMPO collects working defaults for interface motion. It is opinionated about
@@ -82,6 +88,8 @@ export function About() {
                 </p>
               </div>
 
+              <MotionRuler />
+
               <div className="about-steps">
                 {[
                   { n: '01', title: 'Start with the job', copy: 'Orient, explain, or confirm. Name the purpose before choosing a curve.' },
@@ -89,7 +97,7 @@ export function About() {
                   { n: '03', title: 'Test the floor', copy: 'Keyboard, reduced motion, low-end phone, slow connection. The floor is the experience.' },
                   { n: '04', title: 'Remove one thing', copy: 'If the interface still reads clearly without an animation, consider leaving it out.' },
                 ].map((step) => (
-                  <Reveal as="article" className="about-step" key={step.n}>
+                  <Reveal as="article" className="about-step" variant="mask" key={step.n}>
                     <span className="mono">{step.n}</span>
                     <h3>{step.title}</h3>
                     <p>{step.copy}</p>

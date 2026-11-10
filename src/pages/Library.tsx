@@ -4,6 +4,7 @@ import { PageMeta } from '../components/PageMeta'
 import { CodeSample } from '../components/CodeSample'
 import { Icon } from '../components/Icons'
 import { Reveal } from '../components/Reveal'
+import { SplitHeading } from '../components/SplitHeading'
 import {
   CompareDemo,
   CounterDemo,
@@ -398,9 +399,13 @@ export function Library() {
         <div className="wrap page-intro__grid">
           <p className="page-intro__label mono">03 / Library</p>
           <div className="page-intro__body">
-            <h1>
-              Twelve patterns, <em>ready to lift.</em>
-            </h1>
+            <SplitHeading
+              as="h1"
+              segments={[
+                { text: 'Twelve patterns,' },
+                { text: 'ready to lift.', accent: true },
+              ]}
+            />
             <div className="page-intro__lead">
               <p>
                 Tested defaults for the jobs that come up again and again. Every demo runs here, in
@@ -495,7 +500,7 @@ export function Library() {
               {filtered.map((pattern, index) => {
                 const isOpen = openCode.includes(pattern.id)
                 return (
-                  <Reveal as="article" key={pattern.id} className="pattern-card" delay={Math.min(index, 5) * 35} id={pattern.id}>
+                  <Reveal as="article" key={pattern.id} className="pattern-card" variant="scale" delay={Math.min(index, 5) * 35} id={pattern.id}>
                     <div className="pattern-card__stage">
                       <pattern.Demo />
                     </div>

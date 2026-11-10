@@ -1,9 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageMeta } from '../components/PageMeta'
 import { Reveal } from '../components/Reveal'
+import { SplitHeading } from '../components/SplitHeading'
 import { Icon } from '../components/Icons'
+import { PatternReel } from '../features/PatternReel'
 import { useMotion } from '../lib/motion-context'
+import { supportsWebgl } from '../lib/webgl'
+import { loadScroll } from '../lib/scroll'
+import { openJarvis } from '../lib/jarvis-events'
+
+const SignalField3D = lazy(() => import('../features/SignalField3D'))
 
 const tickerItems = [
   'Ease with intent',
@@ -14,7 +21,15 @@ const tickerItems = [
   'Measure, then cut',
 ]
 
-function HeroSignal() {
+type HeroSignalProps = {
+  paused: boolean
+  show3d: boolean
+  ready: boolean
+  onReady: () => void
+  onFail: () => void
+}
+
+function HeroSignal({ paused, show3d, ready, onReady, onFail }: HeroSignalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { reduced } = useMotion()
 
@@ -119,7 +134,7 @@ function HeroSignal() {
     resizeObserver.observe(canvas)
     resize()
 
-    if (!reduced) {
+    if (!reduced && !paused) {
       canvas.addEventListener('pointermove', onPointerMove)
       canvas.addEventListener('pointerleave', onPointerLeave)
       document.addEventListener('visibilitychange', onVisibility)
@@ -134,23 +149,27 @@ function HeroSignal() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.cancelAnimationFrame(frame)
     }
-  }, [reduced])
+  }, [paused, reduced])
 
   return (
-    <figure className="signal">
+    <figure className={ready ? 'signal is-3d' : 'signal'}>
       <figcaption className="signal__top mono">
         <span className="signal__live">
           <span className="signal__live-dot" aria-hidden="true" /> Live signal
         </span>
         <span>Ref. 01 / pointer</span>
       </figcaption>
-      <div className="signal__canvas-wrap">
-        <canvas
-          ref={canvasRef}
-          className="signal__canvas"
-          aria-label="Decorative animated waveform that responds to pointer movement"
-          role="img"
-        />
+      <div
+        className="signal__canvas-wrap"
+        role="img"
+        aria-label="Decorative animated waveform field that responds to pointer movement"
+      >
+        <canvas ref={canvasRef} className="signal__canvas" aria-hidden="true" />
+        {show3d && (
+          <Suspense fallback={null}>
+            <SignalField3D onReady={onReady} onFail={onFail} />
+          </Suspense>
+        )}
         <span className="signal__corner signal__corner--tl" aria-hidden="true">+</span>
         <span className="signal__corner signal__corner--tr" aria-hidden="true">+</span>
         <span className="signal__corner signal__corner--bl" aria-hidden="true">+</span>
@@ -159,7 +178,7 @@ function HeroSignal() {
       <div className="signal__readout">
         <span className="mono">Field / pointer</span>
         <span className="mono">Easing / organic</span>
-        <span className="mono">Frame / 60</span>
+        <span className="mono">Frame / {ready ? 'WebGL' : '60'}</span>
       </div>
       <div className="signal__hint mono">Move the pointer across the field</div>
     </figure>
@@ -399,6 +418,131 @@ function HomeBudget() {
 }
 
 export function Home() {
+  const { reduced } = useMotion()
+  const heroRef = useRef<HTMLElement>(null)
+  const labPathRef = useRef<SVGPathElement>(null)
+  const labRunnerRef = useRef<SVGCircleElement>(null)
+  const [webgl, setWebgl] = useState(() => supportsWebgl())
+  const [wide, setWide] = useState(() => window.matchMedia('(min-width: 900px)').matches)
+  const [ready, setReady] = useState(false)
+  const show3d = webgl && wide && !reduced
+  const fieldReady = ready && show3d
+
+  const onFieldReady = useCallback(() => setReady(true), [])
+  const onFieldFail = useCallback(() => {
+    setWebgl(false)
+    setReady(false)
+  }, [])
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 900px)')
+    const onChange = (event: MediaQueryListEvent) => setWide(event.matches)
+    query.addEventListener('change', onChange)
+    return () => query.removeEventListener('change', onChange)
+  }, [])
+
+  useEffect(() => {
+    if (reduced) return
+    const hero = heroRef.current
+    if (!hero) return
+
+    let cancelled = false
+    let teardown: (() => void) | undefined
+
+    loadScroll()
+      .then(({ gsap }) => {
+        if (cancelled) return
+        const media = gsap.matchMedia()
+        media.add('(min-width: 901px)', () => {
+          const context = gsap.context(() => {
+            const trigger = {
+              trigger: hero,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 0.7,
+            }
+
+            gsap.to('.hero__copy', {
+              y: -34,
+              ease: 'none',
+              scrollTrigger: trigger,
+            })
+            gsap.to('.signal', {
+              y: 48,
+              ease: 'none',
+              scrollTrigger: trigger,
+            })
+          }, hero)
+
+          return () => context.revert()
+        })
+        teardown = () => media.revert()
+      })
+      .catch(() => {
+        /* The hero stays readable without scroll-linked depth. */
+      })
+
+    return () => {
+      cancelled = true
+      teardown?.()
+    }
+  }, [reduced])
+
+  useEffect(() => {
+    if (reduced) return
+    const path = labPathRef.current
+    const runner = labRunnerRef.current
+    if (!path || !runner) return
+
+    const length = path.getTotalLength()
+    let cancelled = false
+    let teardown: (() => void) | undefined
+
+    loadScroll()
+      .then(({ gsap }) => {
+        if (cancelled) return
+        const media = gsap.matchMedia()
+        media.add('(min-width: 701px)', () => {
+          gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
+
+          const trigger = {
+            trigger: '.lab-teaser',
+            start: 'top 78%',
+            end: 'bottom 62%',
+            scrub: 0.6,
+          }
+
+          const draw = gsap.to(path, {
+            strokeDashoffset: 0,
+            ease: 'none',
+            scrollTrigger: trigger,
+          })
+          const travel = gsap.to(runner, {
+            motionPath: { path, align: path, alignOrigin: [0.5, 0.5] },
+            ease: 'none',
+            scrollTrigger: { ...trigger },
+          })
+
+          return () => {
+            draw.scrollTrigger?.kill()
+            travel.scrollTrigger?.kill()
+            draw.kill()
+            travel.kill()
+            gsap.set(path, { clearProps: 'strokeDasharray,strokeDashoffset' })
+          }
+        })
+        teardown = () => media.revert()
+      })
+      .catch(() => {
+        /* The curve stays fully drawn without scroll scrubbing. */
+      })
+
+    return () => {
+      cancelled = true
+      teardown?.()
+    }
+  }, [reduced])
+
   return (
     <>
       <PageMeta
@@ -407,7 +551,7 @@ export function Home() {
         path="/"
       />
 
-      <section className="hero" aria-labelledby="hero-title">
+      <section className="hero" ref={heroRef} aria-labelledby="hero-title">
         <div className="wrap hero__grid">
           <div className="hero__copy">
             <p className="hero__eyebrow mono">
@@ -438,7 +582,13 @@ export function Home() {
           </div>
 
           <div className="hero__signal-col">
-            <HeroSignal />
+            <HeroSignal
+              paused={fieldReady}
+              show3d={show3d}
+              ready={fieldReady}
+              onReady={onFieldReady}
+              onFail={onFieldFail}
+            />
             <p className="hero__signal-note mono">
               Fig. 01 — a field of frequencies. One pointer, no purpose beyond curiosity.
             </p>
@@ -593,9 +743,10 @@ export function Home() {
               <svg viewBox="0 0 320 240" className="ease-preview__graphic" fill="none">
                 <path d="M24 216H296M24 216V24" stroke="currentColor" strokeOpacity="0.25" />
                 <path d="M24 96H296M24 156H296M104 24V216M184 24V216M264 24V216" stroke="currentColor" strokeOpacity="0.12" strokeDasharray="2 6" />
-                <path d="M24 216C77 216 82 26 296 26" stroke="var(--acid)" strokeWidth="2" />
+                <path ref={labPathRef} d="M24 216C77 216 82 26 296 26" stroke="var(--acid)" strokeWidth="2" />
                 <circle cx="24" cy="216" r="4" fill="var(--paper)" />
                 <circle cx="296" cy="26" r="4" fill="var(--signal)" />
+                {!reduced && <circle ref={labRunnerRef} r="5" fill="var(--paper)" stroke="var(--ink)" strokeWidth="1.5" />}
                 <path d="M24 216L77 216M296 26L296 26" stroke="currentColor" strokeOpacity="0.4" strokeDasharray="2 4" />
               </svg>
               <div className="ease-preview__track">
@@ -661,20 +812,32 @@ export function Home() {
         </div>
       </section>
 
+      <PatternReel />
+
       <HomeBudget />
 
       <section className="closing" aria-labelledby="closing-title">
         <div className="wrap closing__inner">
           <p className="mono closing__label">End note</p>
-          <h2 id="closing-title" className="closing__title">
-            The best motion is <em className="serif">noticed</em> only when it is missing.
-          </h2>
+          <SplitHeading
+            as="h2"
+            id="closing-title"
+            className="closing__title"
+            segments={[
+              { text: 'The best motion is' },
+              { text: 'noticed', accent: true },
+              { text: 'only when it is missing.' },
+            ]}
+          />
           <p className="closing__copy">
             Use it to explain what changed, where it came from, and what to do next. Then get out of
             the way.
           </p>
           <div className="closing__actions">
             <Link className="btn btn--signal" to="/lab">Try the lab <Icon name="arrow" size={16} /></Link>
+            <button className="btn" type="button" onClick={openJarvis}>
+              Ask Jarvis <Icon name="arrow" size={16} />
+            </button>
             <Link className="text-link" to="/about">Read the method <Icon name="arrow" size={14} /></Link>
           </div>
         </div>

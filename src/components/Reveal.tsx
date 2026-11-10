@@ -2,16 +2,25 @@ import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { useMotion } from '../lib/motion-context'
 
+type RevealVariant = 'rise' | 'mask' | 'scale' | 'fade'
+
 type RevealProps = {
   children: ReactNode
   as?: 'div' | 'section' | 'article' | 'li' | 'figure' | 'header' | 'aside'
   className?: string
   delay?: number
-  fade?: boolean
+  variant?: RevealVariant
   id?: string
 }
 
-export function Reveal({ children, as = 'div', className = '', delay = 0, fade = false, id }: RevealProps) {
+export function Reveal({
+  children,
+  as = 'div',
+  className = '',
+  delay = 0,
+  variant = 'rise',
+  id,
+}: RevealProps) {
   const Tag = as
   const ref = useRef<HTMLElement | null>(null)
   const { reduced } = useMotion()
@@ -36,18 +45,14 @@ export function Reveal({ children, as = 'div', className = '', delay = 0, fade =
           }
         }
       },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+      { rootMargin: '0px 0px -8% 0px', threshold: variant === 'mask' ? 0 : 0.05 },
     )
     observer.observe(node)
 
-    const fallback = window.setTimeout(() => node.classList.add('is-in'), 2500)
-    return () => {
-      observer.disconnect()
-      window.clearTimeout(fallback)
-    }
-  }, [reduced])
+    return () => observer.disconnect()
+  }, [reduced, variant])
 
-  const classes = ['reveal', fade ? 'reveal--fade' : '', className].filter(Boolean).join(' ')
+  const classes = ['reveal', `reveal--${variant}`, className].filter(Boolean).join(' ')
 
   return (
     <Tag

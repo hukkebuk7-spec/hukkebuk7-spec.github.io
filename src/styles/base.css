@@ -253,19 +253,91 @@ html[data-motion='reduced'] *::after {
 .reveal {
   transition:
     opacity var(--dur-reveal) var(--ease-out),
-    transform var(--dur-reveal) var(--ease-out);
+    transform var(--dur-reveal) var(--ease-out),
+    clip-path var(--dur-reveal) var(--ease-out);
 }
 
 .reveal--armed {
+  opacity: 0;
   transform: translateY(1.75rem);
 }
 
-.reveal--armed.is-in {
+.reveal--mask.reveal--armed {
   transform: none;
+  clip-path: inset(0 0 100% 0);
+}
+
+.reveal--scale.reveal--armed {
+  transform: scale(0.965) translateY(1rem);
+}
+
+.reveal--fade.reveal--armed {
+  transform: none;
+}
+
+.reveal--armed.is-in {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal--armed {
+    opacity: 1;
     transform: none;
+    clip-path: none;
   }
+}
+
+/* Word-level headline reveal */
+.split-heading .split-segment {
+  display: inline;
+}
+
+.split-word {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+  vertical-align: bottom;
+}
+
+.split-word__inner {
+  display: inline-block;
+}
+
+.split-heading.is-armed .split-word__inner {
+  transform: translateY(112%);
+  transition: transform 900ms var(--ease-out);
+  transition-delay: calc(var(--i) * 55ms + 60ms);
+}
+
+.split-heading.is-armed.is-in .split-word__inner {
+  transform: none;
+}
+
+/* Route change wipe */
+.route-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background: var(--ink);
+  border-bottom: 0.35rem solid var(--acid);
+  animation: route-wipe 640ms var(--ease-in-out) both;
+}
+
+@keyframes route-wipe {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-wipe {
+    display: none;
+  }
+}
+
+html[data-motion='reduced'] .route-wipe {
+  display: none;
 }

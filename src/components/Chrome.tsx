@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Icon, Wordmark } from './Icons'
 import { useMotion } from '../lib/motion-context'
+import { loadScroll } from '../lib/scroll'
+import { JARVIS_OPEN_EVENT, openJarvis } from '../lib/jarvis-events'
 
 const navItems = [
   { to: '/lab', label: 'Lab', index: '02' },
@@ -65,6 +67,12 @@ export function Header() {
   const toggleRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
+    const onJarvis = () => setMenuOpen(false)
+    window.addEventListener(JARVIS_OPEN_EVENT, onJarvis)
+    return () => window.removeEventListener(JARVIS_OPEN_EVENT, onJarvis)
+  }, [])
+
+  useEffect(() => {
     document.body.classList.toggle('menu-open', menuOpen)
     if (!menuOpen) return
 
@@ -119,6 +127,20 @@ export function Header() {
           </nav>
 
           <div className="header-actions">
+            <button
+              type="button"
+              className="jarvis-trigger"
+              onClick={() => {
+                setMenuOpen(false)
+                openJarvis()
+              }}
+              aria-haspopup="dialog"
+              aria-keyshortcuts="Control+K Meta+K"
+              title="Ask Jarvis (Ctrl K)"
+            >
+              <span className="jarvis-trigger__led" aria-hidden="true" />
+              <span className="jarvis-trigger__label">Jarvis</span>
+            </button>
             <MotionToggle />
             <button
               ref={toggleRef}
@@ -166,6 +188,55 @@ export function Header() {
 }
 
 export function Footer() {
+  const { reduced } = useMotion()
+  const wordRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (reduced) return
+    const word = wordRef.current
+    if (!word) return
+
+    let cancelled = false
+    let teardown: (() => void) | undefined
+
+    loadScroll()
+      .then(({ gsap }) => {
+        if (cancelled) return
+        const media = gsap.matchMedia()
+        media.add('(min-width: 700px)', () => {
+          const weight = { value: 320 }
+          const tween = gsap.to(weight, {
+            value: 800,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: word,
+              start: 'top bottom',
+              end: 'bottom bottom',
+              scrub: 0.8,
+            },
+            onUpdate: () => {
+              word.style.fontVariationSettings = `'wght' ${Math.round(weight.value)}`
+            },
+          })
+
+          return () => {
+            tween.scrollTrigger?.kill()
+            tween.kill()
+            word.style.fontVariationSettings = ''
+          }
+        })
+        teardown = () => media.revert()
+      })
+      .catch(() => {
+        /* Motion is an enhancement; the footer stays legible without it. */
+      })
+
+    return () => {
+      cancelled = true
+      teardown?.()
+    }
+  }, [reduced])
+
   return (
     <footer className="site-footer">
       <div className="wrap">
@@ -176,7 +247,7 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="footer-word" aria-hidden="true">
+        <div ref={wordRef} className="footer-word" aria-hidden="true">
           TEMPO<span>.</span>
         </div>
 
