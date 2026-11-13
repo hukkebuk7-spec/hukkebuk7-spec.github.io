@@ -47,6 +47,15 @@ CSP hash for the inline JSON-LD block.
 
 Deploy the generated `dist/` directory to any static host.
 
+## GitHub Pages
+
+The site is published at **https://hukkebuk7-spec.github.io/**.
+
+Pushing to `main` runs `.github/workflows/deploy.yml`, which builds with
+`VITE_SITE_URL=https://hukkebuk7-spec.github.io`, uploads `dist/`, and deploys
+through GitHub Pages. Pages must use the **GitHub Actions** source (already
+configured). No secrets are required.
+
 ## Cloudflare Pages
 
 - Build command: `npm run build`
